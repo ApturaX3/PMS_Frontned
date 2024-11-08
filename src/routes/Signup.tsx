@@ -1,18 +1,24 @@
-
-import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
-import { createUserWithEmailAndPassword, getAuth, signInWithPopup } from "firebase/auth"
-import { auth as Authenticate, provider, signInWithGoogle } from "../firebaseSetup"
-import { FaGoogle, FaEnvelope, FaLock, FaGithub } from "react-icons/fa"
-import { Navigate } from "react-router-dom"
-import Loader from "@/components/Loader"
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithPopup,
+} from 'firebase/auth';
+import {
+  auth as Authenticate,
+  provider,
+  signInWithGoogle,
+} from '../firebaseSetup';
+import { FaGoogle, FaEnvelope, FaLock, FaGithub } from 'react-icons/fa';
+import { Navigate } from 'react-router-dom';
+import Loader from '@/components/Loader';
 
 export default function Signup() {
-
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isAuthChecked, setIsAuthChecked] = useState(false);
 
@@ -29,59 +35,57 @@ export default function Signup() {
   }, []);
 
   if (!isAuthChecked) {
-    
     return (
       <div className="flex flex-col gap-3 items-center justify-center min-h-screen bg-gradient-to-br from-purple-400 to-indigo-600">
         <Loader />
         <h1 className=" text-pretty ts">Authenticating...</h1>
       </div>
-    )
+    );
   }
 
   if (isSignedIn) {
     return <Navigate to="/dashboard" replace />;
   }
 
-   
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
     try {
       await createUserWithEmailAndPassword(Authenticate, email, password);
-        <Navigate to="/dashboard" replace />
+      <Navigate to="/dashboard" replace />;
     } catch (e) {
       console.log(e);
-      setError("Failed to Signup");
+      setError('Failed to Signup');
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   const handleGoogleSignup = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       await signInWithGoogle();
-      <Navigate to="/dashboard" replace />
+      <Navigate to="/dashboard" replace />;
     } catch (e) {
-      setError("Failed to Signup")
-      console.log(e)
+      setError('Failed to Signup');
+      console.log(e);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleGithubLogin = async () => {
     setIsLoading(true);
-    try{
+    try {
       await signInWithPopup(Authenticate, provider);
-      <Navigate to="/dashboard" replace />
-    }catch(e){
+      <Navigate to="/dashboard" replace />;
+    } catch (e) {
       console.log(e);
-      setError("Invalid Credential")
-    }finally{
+      setError('Invalid Credential');
+    } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-400 to-indigo-600">
@@ -91,7 +95,9 @@ export default function Signup() {
         transition={{ duration: 0.5 }}
         className="bg-white p-8 rounded-lg shadow-xl w-90"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Create Account</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+          Create Account
+        </h2>
         {error && (
           <motion.p
             initial={{ opacity: 0 }}
@@ -131,7 +137,7 @@ export default function Signup() {
             whileTap={{ scale: 0.95 }}
             disabled={isLoading}
           >
-            {isLoading ? "Creating..." : "Create Account"}
+            {isLoading ? 'Creating...' : 'Create Account'}
           </motion.button>
         </form>
         <div className="mt-4">
@@ -144,7 +150,7 @@ export default function Signup() {
             disabled={isLoading}
           >
             <FaGoogle className="mr-2" />
-            {isLoading ? "Signing up..." : "Sign in with Google"}
+            {isLoading ? 'Signing up...' : 'Sign in with Google'}
           </motion.button>
         </div>
         <div className="mt-4">
@@ -157,19 +163,21 @@ export default function Signup() {
             disabled={isLoading}
           >
             <FaGithub className="mr-2" />
-            {isLoading ? "Logging in..." : "Login with Github"}
+            {isLoading ? 'Logging in...' : 'Login with Github'}
           </motion.button>
-          </div>
+        </div>
         <div className="mt-4 text-center">
-            <p className="text-gray-600 text-sm">
-              Already have an account?{" "}
-              <a href="/signin"
-               className="text-purple-600 hover:underline text-base">
-                Login
-              </a>
-            </p>
-          </div>
+          <p className="text-gray-600 text-sm">
+            Already have an account?{' '}
+            <a
+              href="/signin"
+              className="text-purple-600 hover:underline text-base"
+            >
+              Login
+            </a>
+          </p>
+        </div>
       </motion.div>
     </div>
-  )
+  );
 }

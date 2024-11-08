@@ -1,89 +1,91 @@
-
-import React, { useEffect, useState } from "react"
-import { motion } from "framer-motion"
-import { getAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth"
-import { auth as Authenticate, provider, signInWithGoogle } from "../firebaseSetup"
-import { FaGoogle, FaEnvelope, FaLock, FaGithub } from "react-icons/fa"
-import { Navigate } from "react-router-dom"
-import Loader from "@/components/Loader"
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from 'firebase/auth';
+import {
+  auth as Authenticate,
+  provider,
+  signInWithGoogle,
+} from '../firebaseSetup';
+import { FaGoogle, FaEnvelope, FaLock, FaGithub } from 'react-icons/fa';
+import { Navigate } from 'react-router-dom';
+import Loader from '@/components/Loader';
 
 export default function Login() {
- 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [isAuthChecked, setIsAuthChecked] = useState(false);
-   
-    useEffect(()=>{
-      const auth = getAuth();
-      const unsubscribe = auth.onAuthStateChanged((user)=>{
-        if(user){
-          setIsLogin(true)
-        }
-        setIsAuthChecked(true)
-      })
-      return ()=>unsubscribe()
-    },[]);
- 
-    if(!isAuthChecked){
-      return(
-        <div className="flex flex-col gap-3 items-center justify-center min-h-screen bg-gradient-to-br from-purple-400 to-indigo-600">
-          <Loader />
-          <h1 className="text-pretty ts">Authenticating...</h1>
-        </div>
-      )
-    }
 
-    if(isLogin){
-      return <Navigate to="/dashboard" replace />
-    }
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setIsLogin(true);
+      }
+      setIsAuthChecked(true);
+    });
+    return () => unsubscribe();
+  }, []);
 
+  if (!isAuthChecked) {
+    return (
+      <div className="flex flex-col gap-3 items-center justify-center min-h-screen bg-gradient-to-br from-purple-400 to-indigo-600">
+        <Loader />
+        <h1 className="text-pretty ts">Authenticating...</h1>
+      </div>
+    );
+  }
+
+  if (isLogin) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
     try {
       await signInWithEmailAndPassword(Authenticate, email, password);
-       <Navigate to="/dashboard" replace />
+      <Navigate to="/dashboard" replace />;
     } catch (e) {
-      setError("Invalid Email or Password")
-      console.error(e)
+      setError('Invalid Email or Password');
+      console.error(e);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-
-  }
-
+  };
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       await signInWithGoogle();
-        <Navigate to="/dashboard" replace />
+      <Navigate to="/dashboard" replace />;
     } catch (e) {
-      setError("Invalid credentials")
-      console.log(e)
+      setError('Invalid credentials');
+      console.log(e);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const handleGithubLogin = async ()=>{
+  const handleGithubLogin = async () => {
     setIsLoading(true);
-    try{
-
+    try {
       const obj = await signInWithPopup(Authenticate, provider);
       console.log(obj);
-       <Navigate to="/dashboard" replace />
-    }catch(e){
-      console.log(e)
-      setError("Invalid credentials")
-  }finally{
-    setIsLoading(false)
-  }
-}
+      <Navigate to="/dashboard" replace />;
+    } catch (e) {
+      console.log(e);
+      setError('Invalid credentials');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-400 to-indigo-600">
@@ -93,7 +95,9 @@ export default function Login() {
         transition={{ duration: 0.5 }}
         className="bg-white p-8 rounded-lg shadow-xl w-96"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Login</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+          Login
+        </h2>
         {error && (
           <motion.p
             initial={{ opacity: 0 }}
@@ -133,7 +137,7 @@ export default function Login() {
             whileTap={{ scale: 0.95 }}
             disabled={isLoading}
           >
-            {isLoading ? "Logging in..." : "Login"}
+            {isLoading ? 'Logging in...' : 'Login'}
           </motion.button>
         </form>
         <div className="mt-4">
@@ -146,10 +150,10 @@ export default function Login() {
             disabled={isLoading}
           >
             <FaGoogle className="mr-2" />
-            {isLoading ? "Logging in..." : "Login with Google"}
+            {isLoading ? 'Logging in...' : 'Login with Google'}
           </motion.button>
-          </div>
-          <div className="mt-4">
+        </div>
+        <div className="mt-4">
           <motion.button
             type="button"
             onClick={handleGithubLogin}
@@ -159,20 +163,22 @@ export default function Login() {
             disabled={isLoading}
           >
             <FaGithub className="mr-2" />
-            {isLoading ? "Logging in..." : "Login with Github"}
+            {isLoading ? 'Logging in...' : 'Login with Github'}
           </motion.button>
-          </div>
+        </div>
 
-          <div className="mt-4 text-center">
-            <p className="text-gray-600 text-sm">
-              Don't have an account?{" "}
-              <a href="/signup"
-               className="text-purple-600 hover:underline text-base">
-                Register
-              </a>
-            </p>
-          </div>
+        <div className="mt-4 text-center">
+          <p className="text-gray-600 text-sm">
+            Don't have an account?{' '}
+            <a
+              href="/signup"
+              className="text-purple-600 hover:underline text-base"
+            >
+              Register
+            </a>
+          </p>
+        </div>
       </motion.div>
     </div>
-  )
+  );
 }
