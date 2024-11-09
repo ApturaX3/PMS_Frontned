@@ -2,7 +2,6 @@ import ProjectDashboard from '@/components/ProjectDashboard';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import axios from 'axios';
 
 export default function Dashboard() {
   const [isSignedOut, setIsSignedOut] = useState(false);

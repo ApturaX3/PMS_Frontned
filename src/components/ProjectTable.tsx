@@ -2,13 +2,12 @@ import React from 'react';
 import {
   Table,
   TableBody,
-  TableCell,
   TableHeader,
   TableRow,
   TableHead,
 } from '@/components/ui/table';
-import { ProjectRow } from './projectRow';
 import { ProjectTypes } from '@/types';
+import { ProjectRow } from './ProjectRow';
 
 export const ProjectTable = ({ projects }: { projects: ProjectTypes[] }) => {
   return (

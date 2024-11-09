@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ProjectTypes } from "@/types"
-import { ProjectTable } from "./projectTable"
+import { ProjectTable } from "./ProjectTable"
 import axios from "axios"
 
 const ProjectDashboard = () => {
@@ -11,7 +11,7 @@ const ProjectDashboard = () => {
     async function fetchProjects() {
       try {
         const response = await axios.get("http://localhost:3000/api/v1/projects")
-        //@ts-
+        //@ts-expect-error: data might be null
         setProjects(response?.data)
       } catch (error) {
         console.error("Failed to fetch projects:", error)

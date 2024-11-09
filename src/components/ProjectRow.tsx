@@ -23,20 +23,21 @@ import {
   SelectItem,
   SelectValue,
 } from './ui/select';
-import { DatePicker } from './ui/datepicker';
+
 import { DatePickerWithRange } from './ui/dateRangePicker';
 import LastUpdated from './lastUpdate';
+import { DatePicker } from './ui/datePicker';
 
 export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
   const [editedProject, setEditedProject] = useState<ProjectTypes>(project);
 
   const handleDueDateChange = (newDate: string | Date | undefined) => {
-    setEditedProject({ ...editedProject, due_date: newDate });
+    setEditedProject({ ...editedProject, due_date: newDate instanceof Date ? newDate.toISOString() : newDate });
   };
   const handleSaveChanges = async () => {
     try {
       await axios.put(
-        `http://localhost:3000/api/v1/projects/${project.id}`,
+        `${process.env.VITE_BACKEND_URL ? process.env.VITE_BACKEND_URL : 'http://localhost:3000'}./api/v1/projects/${project.id}`,
         editedProject,
       );
       alert('Project updated successfully!');
