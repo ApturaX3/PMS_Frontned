@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import {
   createUserWithEmailAndPassword,
@@ -13,6 +14,7 @@ import {
 import { FaGoogle, FaEnvelope, FaLock, FaGithub } from 'react-icons/fa';
 import { Navigate } from 'react-router-dom';
 import Loader from '@/components/Loader';
+import { BACKEND_URL } from '@/config';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -51,8 +53,27 @@ export default function Signup() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(Authenticate, email, password);
-      <Navigate to="/dashboard" replace />;
+      const userCredentials= await createUserWithEmailAndPassword(Authenticate, email, password);
+      const user = userCredentials.user
+      const res = await axios.post(`${BACKEND_URL}/api/v1/user/storeuser`,
+        {
+          firebaseUid:user.uid,
+          email: email,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      if(res.status === 200){
+        console.log("ers");
+        console.log("res",res);
+        <Navigate to="/dashboard" replace />;
+      }else{
+        console.log(res);
+      }
+
     } catch (e) {
       console.log(e);
       setError('Failed to Signup');
