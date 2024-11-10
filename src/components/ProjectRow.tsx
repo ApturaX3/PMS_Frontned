@@ -12,32 +12,41 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
-  SelectValue,
 } from './ui/select';
 
 import { DatePickerWithRange } from './ui/dateRangePicker';
 import LastUpdated from './lastUpdate';
 import { DatePicker } from './ui/datePicker';
+import { BACKEND_URL } from '@/config';
+import LeaderPopup from './LeaderPopup';
 
 export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
   const [editedProject, setEditedProject] = useState<ProjectTypes>(project);
 
+
   const handleDueDateChange = (newDate: string | Date | undefined) => {
-    setEditedProject({ ...editedProject, due_date: newDate instanceof Date ? newDate.toISOString() : newDate });
+    setEditedProject({
+      ...editedProject,
+      due_date: newDate instanceof Date ? newDate.toISOString() : newDate,
+    });
   };
+
+  const handlePriorityChange = (priority: string) => {
+    setEditedProject({ ...editedProject, priority });
+  }
+
+  const handleStatusChange = (status: ProjectStatus) => {
+    setEditedProject({ ...editedProject, status });
+  };
+
   const handleSaveChanges = async () => {
     try {
       await axios.put(
-        `${process.env.VITE_BACKEND_URL ? process.env.VITE_BACKEND_URL : 'http://localhost:3000'}./api/v1/projects/${project.id}`,
+        `${BACKEND_URL}/api/v1/projects/${project.id}`,
         editedProject,
       );
       alert('Project updated successfully!');
@@ -57,48 +66,36 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
         />
       </TableCell>
       <TableCell>
-        {project.leader?.firstName} {project.leader?.lastName}
+     <LeaderPopup project={project} />
       </TableCell>
 
       <TableCell>
-        <Popover>
-          <PopoverTrigger>
-            <Badge
-              variant="secondary"
-              className={
-                project.status === 'NOT_STARTED'
-                  ? 'bg-red-500/15 text-red-500'
-                  : project.status === 'COMPLETED'
-                    ? 'bg-green-500/15 text-green-500'
-                    : 'bg-yellow-500/15 text-yellow-500'
-              }
-            >
-              {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-            </Badge>
-          </PopoverTrigger>
-          <PopoverContent>
-            <Select
-              value={editedProject.status}
-              onValueChange={(value) =>
-                setEditedProject({
-                  ...editedProject,
-                  status: value as ProjectStatus,
-                })
-              }
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="NOT_STARTED">Not Started</SelectItem>
-                <SelectItem value="PENDING">Pending</SelectItem>
-                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                <SelectItem value="COMPLETED">Completed</SelectItem>
-                <SelectItem value="ON_HOLD">On Hold</SelectItem>
-              </SelectContent>
-            </Select>
-          </PopoverContent>
-        </Popover>
+        <Select
+          value={editedProject.status}
+          onValueChange={(value) => handleStatusChange(value as ProjectStatus)}
+        >
+          <SelectTrigger
+            className={`border-none focus:ring-0 focus:ring-offset-0  px-1 py-1 rounded-full text-xs   font-medium flex items-center justify-center  ${
+              editedProject.status === 'NOT_STARTED'
+                ? 'bg-red-500/15 text-red-500'
+                : editedProject.status === 'COMPLETED'
+                  ? 'bg-green-500/15 text-green-500'
+                  : 'bg-yellow-500/15 text-yellow-500'
+            }`}
+          >
+            <span className="text-center w-full">
+              {editedProject.status.charAt(0).toUpperCase() +
+                editedProject.status.slice(1)}
+            </span>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="NOT_STARTED">Not Started</SelectItem>
+            <SelectItem value="PENDING">Pending</SelectItem>
+            <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+            <SelectItem value="COMPLETED">Completed</SelectItem>
+            <SelectItem value="ON_HOLD">On Hold</SelectItem>
+          </SelectContent>
+        </Select>
       </TableCell>
       <TableCell>
         <DatePicker
@@ -107,43 +104,30 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
         />
       </TableCell>
       <TableCell>
-        <Popover>
-          <PopoverTrigger>
-            <Badge
-              variant="secondary"
-              className={
-                project.priority === 'HIGH'
-                  ? 'bg-purple-500/15 text-purple-500'
-                  : project.priority === 'MEDIUM'
-                    ? 'bg-blue-500/15 text-blue-500'
-                    : 'bg-gray-500/15 text-gray-500'
-              }
-            >
-              {project.priority.charAt(0).toUpperCase() +
-                project.priority.slice(1)}
-            </Badge>
-          </PopoverTrigger>
-          <PopoverContent>
-            <Select
-              value={editedProject.priority}
-              onValueChange={(value) =>
-                setEditedProject({
-                  ...editedProject,
-                  priority: value as ProjectPriority,
-                })
-              }
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select Priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="LOW">Low</SelectItem>
-                <SelectItem value="MEDIUM">Medium</SelectItem>
-                <SelectItem value="HIGH">High</SelectItem>
-              </SelectContent>
-            </Select>
-          </PopoverContent>
-        </Popover>
+        <Select
+          value={editedProject.priority}
+          onValueChange={(value) =>handlePriorityChange(value as ProjectPriority)}
+        >
+          <SelectTrigger
+            className={`border-none focus:ring-0 focus:ring-offset-0  px-1 py-1 rounded-full text-xs   font-medium flex items-center justify-center  ${
+              editedProject.priority === 'HIGH'
+                ? 'bg-red-500/15 text-red-500'
+                : editedProject.priority === 'MEDIUM'
+                  ? 'bg-yellow-500/15 text-yellow-500'
+                  : 'bg-green-500/15 text-green-500'
+            }`}
+          >
+              <span className="text-center w-full">
+                {editedProject.priority.charAt(0).toUpperCase() +
+                editedProject.priority.slice(1)}
+              </span>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="LOW">Low</SelectItem>
+            <SelectItem value="MEDIUM">Medium</SelectItem>
+            <SelectItem value="HIGH">High</SelectItem>
+          </SelectContent>
+        </Select>
       </TableCell>
       <TableCell className="text-right">
         <EditableInput

@@ -32,7 +32,7 @@ export default function Dashboard() {
       </h2>
       <hr />
       
-      <div className="container mx-auto p-4 bg-white">
+  <div className="p-4 mx-auto  bg-white">
       
         <ProjectDashboard  /> // Pass projects data as prop
     
