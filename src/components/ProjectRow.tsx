@@ -11,12 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-} from './ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
 
 import { DatePickerWithRange } from './ui/dateRangePicker';
 import LastUpdated from './lastUpdate';
@@ -27,7 +22,6 @@ import LeaderPopup from './LeaderPopup';
 export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
   const [editedProject, setEditedProject] = useState<ProjectTypes>(project);
 
-
   const handleDueDateChange = (newDate: string | Date | undefined) => {
     setEditedProject({
       ...editedProject,
@@ -37,7 +31,7 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
 
   const handlePriorityChange = (priority: string) => {
     setEditedProject({ ...editedProject, priority });
-  }
+  };
 
   const handleStatusChange = (status: ProjectStatus) => {
     setEditedProject({ ...editedProject, status });
@@ -45,11 +39,30 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
 
   const handleSaveChanges = async () => {
     try {
-      await axios.put(
+      const { data }: { data: { message?: string } } = await axios.get(
         `${BACKEND_URL}/api/v1/projects/${project.id}`,
-        editedProject,
       );
-      alert('Project updated successfully!');
+      if (data.message === 'Project not found') {
+        // eslint-disable-next-line no-unused-vars
+        const { id, createdAt, ...dataWithoutId } = editedProject;
+        console.log(id);
+        console.log(createdAt);
+        const newProject = await axios.post(
+          `${BACKEND_URL}/api/v1/projects`,
+          dataWithoutId,
+        );
+        if (newProject && newProject.data) {
+          alert('Project created successfully!');
+        } else {
+          throw new Error('Failed to create new project');
+        }
+      } else {
+        await axios.put(
+          `${BACKEND_URL}/api/v1/projects/${project.id}`,
+          editedProject,
+        );
+        alert('Project updated successfully!');
+      }
     } catch (error) {
       console.error('Failed to save changes:', error);
     }
@@ -66,7 +79,7 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
         />
       </TableCell>
       <TableCell>
-     <LeaderPopup project={project} />
+        <LeaderPopup project={project} />
       </TableCell>
 
       <TableCell>
@@ -84,8 +97,8 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
             }`}
           >
             <span className="text-center w-full">
-              {editedProject.status.charAt(0).toUpperCase() +
-                editedProject.status.slice(1)}
+              {editedProject.status?.charAt(0).toUpperCase() +
+                editedProject.status?.slice(1)}
             </span>
           </SelectTrigger>
           <SelectContent>
@@ -106,7 +119,9 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
       <TableCell>
         <Select
           value={editedProject.priority}
-          onValueChange={(value) =>handlePriorityChange(value as ProjectPriority)}
+          onValueChange={(value) =>
+            handlePriorityChange(value as ProjectPriority)
+          }
         >
           <SelectTrigger
             className={`border-none focus:ring-0 focus:ring-offset-0  px-1 py-1 rounded-full text-xs   font-medium flex items-center justify-center  ${
@@ -117,10 +132,10 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
                   : 'bg-green-500/15 text-green-500'
             }`}
           >
-              <span className="text-center w-full">
-                {editedProject.priority.charAt(0).toUpperCase() +
+            <span className="text-center w-full">
+              {editedProject.priority.charAt(0).toUpperCase() +
                 editedProject.priority.slice(1)}
-              </span>
+            </span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="LOW">Low</SelectItem>
@@ -131,9 +146,9 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
       </TableCell>
       <TableCell className="text-right">
         <EditableInput
-          value={editedProject.budget?.toString() || ''}
+          value={editedProject.budget?.toString() || '0'}
           onChange={(value) =>
-            setEditedProject({ ...editedProject, budget: parseInt(value) })
+            setEditedProject({ ...editedProject, budget: parseInt(value) || 0 })
           }
         />
       </TableCell>
@@ -163,7 +178,6 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>
-      <TableCell></TableCell>
     </TableRow>
   );
 };

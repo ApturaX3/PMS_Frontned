@@ -1,6 +1,5 @@
-import React from 'react';
 import { ProjectTypes } from '@/types';
-import { useState } from "react";
+import { useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 const LeaderPopup = ({ project }: { project: ProjectTypes }) => {
@@ -8,11 +7,12 @@ const LeaderPopup = ({ project }: { project: ProjectTypes }) => {
 
   return (
     <Popover open={isPopoverOpen}>
-      <PopoverTrigger asChild
+      <PopoverTrigger
+        asChild
         onMouseEnter={() => setIsPopoverOpen(true)}
         onMouseLeave={() => setIsPopoverOpen(false)}
       >
-        <button className="text-blue-500 underline">
+        <button className="text-black-500 ">
           {project.leader?.firstName} {project.leader?.lastName}
         </button>
       </PopoverTrigger>
@@ -27,7 +27,9 @@ const LeaderPopup = ({ project }: { project: ProjectTypes }) => {
             <p className="font-semibold text-blue-600">
               {project.leader?.firstName} {project.leader?.lastName}
             </p>
-            <p className="text-sm text-gray-600 pt-1">{project.leader?.email}</p>
+            <p className="text-sm text-gray-600 pt-1">
+              {project.leader?.email}
+            </p>
             <p className="text-sm text-green-500">{project.leader?.role}</p>
           </div>
         </div>

@@ -53,27 +53,31 @@ export default function Signup() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const userCredentials= await createUserWithEmailAndPassword(Authenticate, email, password);
-      const user = userCredentials.user
-      const res = await axios.post(`${BACKEND_URL}/api/v1/user/storeuser`,
+      const userCredentials = await createUserWithEmailAndPassword(
+        Authenticate,
+        email,
+        password,
+      );
+      const user = userCredentials.user;
+      const res = await axios.post(
+        `${BACKEND_URL}/api/v1/user/storeuser`,
         {
-          firebaseUid:user.uid,
+          firebaseUid: user.uid,
           email: email,
         },
         {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
-      if(res.status === 200){
-        console.log("ers");
-        console.log("res",res);
+      if (res.status === 200) {
+        console.log('ers');
+        console.log('res', res);
         <Navigate to="/dashboard" replace />;
-      }else{
+      } else {
         console.log(res);
       }
-
     } catch (e) {
       console.log(e);
       setError('Failed to Signup');

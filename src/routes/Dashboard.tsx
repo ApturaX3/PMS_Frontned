@@ -8,7 +8,6 @@ export default function Dashboard() {
   const auth = getAuth();
 
   // Fetch projects data
-  
 
   // Check authentication state
   useEffect(() => {
@@ -31,11 +30,9 @@ export default function Dashboard() {
         Dashboard
       </h2>
       <hr />
-      
-  <div className="p-4 mx-auto  bg-white">
-      
-        <ProjectDashboard  /> // Pass projects data as prop
-    
+
+      <div className="p-4 mx-auto  bg-white">
+        <ProjectDashboard /> // Pass projects data as prop
       </div>
     </div>
   );
