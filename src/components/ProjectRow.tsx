@@ -19,7 +19,13 @@ import { DatePicker } from './ui/datePicker';
 import { BACKEND_URL } from '@/config';
 import LeaderPopup from './LeaderPopup';
 
-export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
+export const ProjectRow = ({
+  project,
+  onDelete,
+}: {
+  project: ProjectTypes;
+  onDelete: (projectId: string) => void;
+}) => {
   const [editedProject, setEditedProject] = useState<ProjectTypes>(project);
 
   const handleDueDateChange = (newDate: string | Date | undefined) => {
@@ -39,33 +45,22 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
 
   const handleSaveChanges = async () => {
     try {
-      const { data }: { data: { message?: string } } = await axios.get(
+      const res = await axios.put(
         `${BACKEND_URL}/api/v1/projects/${project.id}`,
+        editedProject,
       );
-      if (data.message === 'Project not found') {
-        // eslint-disable-next-line no-unused-vars
-        const { id, createdAt, ...dataWithoutId } = editedProject;
-        console.log(id);
-        console.log(createdAt);
-        const newProject = await axios.post(
-          `${BACKEND_URL}/api/v1/projects`,
-          dataWithoutId,
-        );
-        if (newProject && newProject.data) {
-          alert('Project created successfully!');
-        } else {
-          throw new Error('Failed to create new project');
-        }
-      } else {
-        await axios.put(
-          `${BACKEND_URL}/api/v1/projects/${project.id}`,
-          editedProject,
-        );
+      if (res.status === 200) {
         alert('Project updated successfully!');
+      } else {
+        alert('Failed to update project');
       }
     } catch (error) {
       console.error('Failed to save changes:', error);
     }
+  };
+
+  const handleDelete = () => {
+    onDelete(project.id.toString());
   };
 
   return (
@@ -172,6 +167,11 @@ export const ProjectRow = ({ project }: { project: ProjectTypes }) => {
             <DropdownMenuItem>View details</DropdownMenuItem>
             <DropdownMenuItem>Edit project</DropdownMenuItem>
             <DropdownMenuItem>View history</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Button variant="destructive" onClick={handleDelete}>
+                Delete
+              </Button>
+            </DropdownMenuItem>
             <DropdownMenuItem>
               <Button onClick={handleSaveChanges}>Save</Button>
             </DropdownMenuItem>
