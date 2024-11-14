@@ -18,6 +18,7 @@ import LastUpdated from './lastUpdate';
 import { DatePicker } from './ui/datePicker';
 import { BACKEND_URL } from '@/config';
 import LeaderPopup from './LeaderPopup';
+import { EllipsisVertical } from 'lucide-react';
 
 export const ProjectRow = ({
   project,
@@ -64,7 +65,7 @@ export const ProjectRow = ({
   };
 
   return (
-    <TableRow>
+    <TableRow className="text-xs md:text-sm">
       <TableCell>
         <EditableInput
           value={editedProject.title}
@@ -85,10 +86,14 @@ export const ProjectRow = ({
           <SelectTrigger
             className={`border-none focus:ring-0 focus:ring-offset-0  px-1 py-1 rounded-full text-xs   font-medium flex items-center justify-center  ${
               editedProject.status === 'NOT_STARTED'
-                ? 'bg-red-500/15 text-red-500'
+                ? 'bg-red-500/20 text-red-500'
                 : editedProject.status === 'COMPLETED'
-                  ? 'bg-green-500/15 text-green-500'
-                  : 'bg-yellow-500/15 text-yellow-500'
+                  ? 'bg-green-500/25 text-green-800'
+                  : editedProject.status === 'PENDING'
+                    ? 'bg-blue-500/20 text-blue-600'
+                    : editedProject.status === 'ON_HOLD'
+                      ? 'bg-gray-500/20 text-gray-700'
+                      : 'bg-yellow-500/20 text-yellow-600'
             }`}
           >
             <span className="text-center w-full">
@@ -123,8 +128,8 @@ export const ProjectRow = ({
               editedProject.priority === 'HIGH'
                 ? 'bg-red-500/15 text-red-500'
                 : editedProject.priority === 'MEDIUM'
-                  ? 'bg-yellow-500/15 text-yellow-500'
-                  : 'bg-green-500/15 text-green-500'
+                  ? 'bg-yellow-500/15 text-yellow-600'
+                  : 'bg-green-500/15 text-green-800'
             }`}
           >
             <span className="text-center w-full">
@@ -160,7 +165,9 @@ export const ProjectRow = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button size="icon" variant="ghost" className="h-8 w-8">
-              <span className="">:</span>
+              <span className="">
+                <EllipsisVertical />
+              </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -168,12 +175,10 @@ export const ProjectRow = ({
             <DropdownMenuItem>Edit project</DropdownMenuItem>
             <DropdownMenuItem>View history</DropdownMenuItem>
             <DropdownMenuItem>
-              <Button variant="destructive" onClick={handleDelete}>
-                Delete
-              </Button>
+              <button onClick={handleDelete}>Delete</button>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Button onClick={handleSaveChanges}>Save</Button>
+              <button onClick={handleSaveChanges}>Save</button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

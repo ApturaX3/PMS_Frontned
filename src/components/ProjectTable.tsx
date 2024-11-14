@@ -64,25 +64,45 @@ export const ProjectTable = ({ auth }: { auth: any }) => {
   };
 
   return (
-    <div>
-      <div className="flex items-center gap-4 bg-background/95 px-6 py-3">
+    <div className="overflow-auto">
+      <div className="flex items-center gap-4 bg-background/15 px-4 py-2">
         <Button className="h-8 gap-2" onClick={handleCreateTask}>
           Create New Task
         </Button>
       </div>
-      <Table>
+      <Table className="min-w-full text-xs md:text-sm">
         <TableHeader>
           <TableRow>
-            <TableHead>Task</TableHead>
-            <TableHead>Leader</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Due Date</TableHead>
-            <TableHead>Priority</TableHead>
-            <TableHead className="text-right">Budget</TableHead>
-            <TableHead>Files</TableHead>
-            <TableHead>Timeline</TableHead>
-            <TableHead>Last Update</TableHead>
-            <TableHead className="w-[50px]">Actions </TableHead>
+            <TableHead className="w-1/4 min-w-[100px] md:min-w-[150px] lg:min-w-[200px]">
+              Project
+            </TableHead>
+            <TableHead className="min-w-[80px] md:min-w-[100px] ">
+              Leader
+            </TableHead>
+            <TableHead className="min-w-[80px] md:min-w-[100px]">
+              Status
+            </TableHead>
+            <TableHead className="min-w-[80px] md:min-w-[100px]">
+              Due Date
+            </TableHead>
+            <TableHead className="min-w-[80px] md:min-w-[120px]">
+              Priority
+            </TableHead>
+            <TableHead className="min-w-[80px] md:min-w-[100px]">
+              Budget
+            </TableHead>
+            <TableHead className="min-w-[80px] md:min-w-[100px]">
+              Files
+            </TableHead>
+            <TableHead className="min-w-[80px] md:min-w-[100px]">
+              Timeline
+            </TableHead>
+            <TableHead className="min-w-[80px] md:min-w-[100px]">
+              Last Update
+            </TableHead>
+            <TableHead className="w-[50px] md:w-[80px] text-right">
+              Actions
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
