@@ -174,11 +174,11 @@ export const ProjectRow = ({
             <DropdownMenuItem>View details</DropdownMenuItem>
             <DropdownMenuItem>Edit project</DropdownMenuItem>
             <DropdownMenuItem>View history</DropdownMenuItem>
-            <DropdownMenuItem>
-              <button onClick={handleDelete}>Delete</button>
+            <DropdownMenuItem onClick={handleDelete}>
+              <button >Delete</button>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <button onClick={handleSaveChanges}>Save</button>
+            <DropdownMenuItem onClick={handleSaveChanges}>
+              <button >Save</button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

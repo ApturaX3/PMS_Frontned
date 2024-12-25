@@ -43,7 +43,7 @@ export default function Login() {
   }
 
   if (isLogin) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/projects" replace />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
