@@ -1,12 +1,42 @@
 import React, { useState } from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import Column from './Column';
-import { PlusCircle } from 'react-feather';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { PlusCircle, X } from 'react-feather';
+import { TaskDetails } from './TaskDetails';
+
+interface Comment {
+  id: string;
+  author: string;
+  avatar: string;
+  content: string;
+  timestamp: string;
+}
 
 interface Task {
   id: string;
   content: string;
+  description?: string;
   priority: 'low' | 'medium' | 'high';
+  assignee: {
+    name: string;
+    avatar: string;
+  };
+  reporter: {
+    name: string;
+    avatar: string;
+  };
+  company: string;
+  marketingMaterials: {
+    datasheet: boolean;
+    factsheet: boolean;
+    ads: boolean;
+  };
+  brochureStatus: string;
+  comparisonSheetStatus: string;
+  labels: string[];
+  orderNumber: string;
+  dueDate: string;
+  status: string;
+  comments: Comment[];
 }
 
 interface Column {
@@ -23,10 +53,51 @@ interface BoardData {
 
 const initialData: BoardData = {
   tasks: {
-    'task-1': { id: 'task-1', content: 'Take out the garbage', priority: 'low' },
-    'task-2': { id: 'task-2', content: 'Watch my favorite show', priority: 'medium' },
-    'task-3': { id: 'task-3', content: 'Charge my phone', priority: 'high' },
-    'task-4': { id: 'task-4', content: 'Cook dinner', priority: 'medium' },
+    'task-1': {
+      id: 'task-1',
+      content: 'Create marketing materials for contextual controllers',
+      description: 'We need to prepare comprehensive marketing materials for our new line of contextual controllers. This includes product brochures, datasheets, and online advertising content.',
+      priority: 'high',
+      assignee: {
+        name: 'Peter Jacobs',
+        avatar: '/placeholder.svg?height=32&width=32'
+      },
+      reporter: {
+        name: 'Larry Stauffer',
+        avatar: '/placeholder.svg?height=32&width=32'
+      },
+      company: 'Smart Controllers Inc.',
+      marketingMaterials: {
+        datasheet: true,
+        factsheet: true,
+        ads: false
+      },
+      brochureStatus: 'In Progress',
+      comparisonSheetStatus: 'Not Started',
+      labels: ['marketing'],
+      orderNumber: '2023-08-15-4',
+      dueDate: 'Oct 1, 2023',
+      status: 'To Do',
+      comments: [
+        {
+          id: 'comment-1',
+          author: 'Jane Doe',
+          avatar: '/placeholder.svg?height=32&width=32',
+          content: 'I\'ve started working on the product datasheet. Will share the first draft by EOD.',
+          timestamp: '2 hours ago'
+        },
+        {
+          id: 'comment-2',
+          author: 'John Smith',
+          avatar: '/placeholder.svg?height=32&width=32',
+          content: 'Great! Let\'s schedule a review meeting once the first draft is ready.',
+          timestamp: '1 hour ago'
+        }
+      ]
+    },
+    'task-2': { id: 'task-2', content: 'Watch my favorite show', priority: 'medium', assignee: { name: '', avatar: '' }, reporter: { name: '', avatar: '' }, company: '', marketingMaterials: { datasheet: false, factsheet: false, ads: false }, brochureStatus: '', comparisonSheetStatus: '', labels: [], orderNumber: '', dueDate: '', status: '', comments: [] },
+    'task-3': { id: 'task-3', content: 'Charge my phone', priority: 'high', assignee: { name: '', avatar: '' }, reporter: { name: '', avatar: '' }, company: '', marketingMaterials: { datasheet: false, factsheet: false, ads: false }, brochureStatus: '', comparisonSheetStatus: '', labels: [], orderNumber: '', dueDate: '', status: '', comments: [] },
+    'task-4': { id: 'task-4', content: 'Cook dinner', priority: 'medium', assignee: { name: '', avatar: '' }, reporter: { name: '', avatar: '' }, company: '', marketingMaterials: { datasheet: false, factsheet: false, ads: false }, brochureStatus: '', comparisonSheetStatus: '', labels: [], orderNumber: '', dueDate: '', status: '', comments: [] },
   },
   columns: {
     'column-1': {
@@ -51,6 +122,7 @@ const initialData: BoardData = {
 export default function TaskBoard() {
   const [boardData, setBoardData] = useState<BoardData>(initialData);
   const [newColumnTitle, setNewColumnTitle] = useState('');
+  const [selectedTask, setSelectedTask] = useState<string | null>(null);
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -142,13 +214,11 @@ export default function TaskBoard() {
   const deleteColumn = (columnId: string) => {
     const newBoardData = { ...boardData };
     const column = newBoardData.columns[columnId];
-    
-    // Delete tasks associated with this column
+
     column.taskIds.forEach(taskId => {
       delete newBoardData.tasks[taskId];
     });
 
-    // Delete the column
     delete newBoardData.columns[columnId];
     newBoardData.columnOrder = newBoardData.columnOrder.filter(id => id !== columnId);
 
@@ -160,7 +230,18 @@ export default function TaskBoard() {
     const newTask: Task = {
       id: newTaskId,
       content: taskContent,
-      priority: 'medium', // Default priority
+      priority: 'medium',
+      assignee: { name: '', avatar: '' },
+      reporter: { name: '', avatar: '' },
+      company: '',
+      marketingMaterials: { datasheet: false, factsheet: false, ads: false },
+      brochureStatus: '',
+      comparisonSheetStatus: '',
+      labels: [],
+      orderNumber: '',
+      dueDate: '',
+      status: '',
+      comments: []
     };
 
     setBoardData((prevState) => ({
@@ -181,27 +262,34 @@ export default function TaskBoard() {
 
   const deleteTask = (columnId: string, taskId: string) => {
     const newBoardData = { ...boardData };
-    
-    // Remove task from column
+
     newBoardData.columns[columnId].taskIds = newBoardData.columns[columnId].taskIds.filter(id => id !== taskId);
-    
-    // Delete task
     delete newBoardData.tasks[taskId];
 
     setBoardData(newBoardData);
   };
 
-  const updateColumnTitle = (columnId: string, newTitle: string) => {
-    setBoardData((prevState) => ({
-      ...prevState,
-      columns: {
-        ...prevState.columns,
-        [columnId]: {
-          ...prevState.columns[columnId],
-          title: newTitle,
-        },
-      },
-    }));
+  // const updateColumnTitle = (columnId: string, newTitle: string) => {
+  //   setBoardData((prevState) => ({
+  //     ...prevState,
+  //     columns: {
+  //       ...prevState.columns,
+  //       [columnId]: {
+  //         ...prevState.columns[columnId],
+  //         title: newTitle,
+  //       },
+  //     },
+  //   }));
+  // };
+
+  const handleTaskClick = (taskId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedTask(taskId);
+  };
+
+  const handleDeleteTask = (e: React.MouseEvent, columnId: string, taskId: string) => {
+    e.stopPropagation();
+    deleteTask(columnId, taskId);
   };
 
   return (
@@ -214,15 +302,76 @@ export default function TaskBoard() {
             const tasks = column.taskIds.map((taskId) => boardData.tasks[taskId]);
 
             return (
-              <Column
-                key={column.id}
-                column={column}
-                tasks={tasks}
-                deleteColumn={deleteColumn}
-                addTask={addTask}
-                deleteTask={deleteTask}
-                updateColumnTitle={updateColumnTitle}
-              />
+              <div key={column.id} className="bg-white rounded-lg shadow-lg w-80 flex flex-col">
+                <div className="flex justify-between items-center p-4 border-b">
+                  <h2 className="text-xl font-semibold text-gray-800">{column.title}</h2>
+                  <button onClick={() => deleteColumn(column.id)} className="text-red-500 hover:text-red-700">
+                    <X size={16} />
+                  </button>
+                </div>
+                <Droppable droppableId={column.id}>
+                  {(provided, snapshot) => (
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className={`flex-grow overflow-y-auto p-4 transition-colors duration-200 ${
+                        snapshot.isDraggingOver ? 'bg-blue-50' : 'bg-gray-50'
+                      }`}
+                      style={{
+                        minHeight: `${Math.max(tasks.length * 100, 50)}px`,
+                        maxHeight: '70vh'
+                      }}
+                    >
+                      {tasks.map((task, index) => (
+                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              onClick={(e) => handleTaskClick(task.id, e)}
+                              className={`p-4 mb-3 rounded-lg shadow-sm border-l-4 cursor-pointer ${
+                                task.priority === 'low' ? 'border-green-400 bg-green-50' :
+                                task.priority === 'medium' ? 'border-yellow-400 bg-yellow-50' :
+                                'border-red-400 bg-red-50'
+                              } ${snapshot.isDragging ? 'shadow-lg' : ''}`}
+                            >
+                              <div className="flex justify-between items-start">
+                                <p className="font-medium">{task.content}</p>
+                                <button 
+                                  onClick={(e) => handleDeleteTask(e, column.id, task.id)} 
+                                  className="text-gray-500 hover:text-red-500"
+                                >
+                                  <X size={16} />
+                                </button>
+                              </div>
+                              <div className="mt-2">
+                                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                                  task.priority === 'low' ? 'bg-green-200 text-green-800' :
+                                  task.priority === 'medium' ? 'bg-yellow-200 text-yellow-800' :
+                                  'bg-red-200 text-red-800'
+                                }`}>
+                                  {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+                {column.title === 'To do' && (
+                  <button
+                    onClick={() => addTask(column.id, 'New Task')}
+                    className="w-full p-4 text-gray-600 hover:text-gray-800 flex items-center justify-center border-t"
+                  >
+                    <PlusCircle size={16} className="mr-2" />
+                    Add Task
+                  </button>
+                )}
+              </div>
             );
           })}
           <div className="bg-white bg-opacity-20 rounded-lg p-4 w-80">
@@ -243,6 +392,11 @@ export default function TaskBoard() {
           </div>
         </div>
       </DragDropContext>
+      <TaskDetails
+        isOpen={!!selectedTask}
+        onClose={() => setSelectedTask(null)}
+        task={selectedTask ? { ...boardData.tasks[selectedTask], description: boardData.tasks[selectedTask].description || '' } : null}
+      />
     </div>
   );
 }
